@@ -1,0 +1,17 @@
+func unique(int[] x){
+    set := int[]
+    for i in range(0, x.length){
+        if !set.contains(x[i]) {
+            set.add(x[i])
+        }
+    }
+    return set
+}
+
+list := int[]
+for i in range(0, read()){
+	list.add(read())
+}
+for i in unique(list){
+	print i
+}

@@ -1,0 +1,16 @@
+func maximum(int[] x){
+    max := x[1]
+    for i in range(0 , x.length){
+        if x[i] > max {
+            max = x[i]
+        }
+    }
+    return max
+}
+
+
+list := int[]
+for i in range(0, read()){
+    list.add(read())
+}
+print maximum(list)

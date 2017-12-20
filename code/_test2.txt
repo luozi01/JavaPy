@@ -1,0 +1,20 @@
+class Kangaroo{
+	func init(int i){
+	 temp = i
+	}
+ 	var b = 123
+  var temp
+ 	func c(int d){
+ 		print b, d*b
+ 	}
+}
+
+var a = 6
+var k = new Kangaroo(a)
+print k.b, k.temp
+var p = k.c(5)
+var list = int[1,2,3,4,5,6,7]
+var temp = list[3]
+list[3] = list[5]
+list[5] = temp
+print list

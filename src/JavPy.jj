@@ -1,0 +1,293 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  static = true;
+}
+
+PARSER_BEGIN(JavPy)
+
+import java.util.*;
+import syntaxtree.*;
+import syntaxtree.Class;
+import visitor.*;
+
+public class JavPy{
+}
+
+PARSER_END(JavPy)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+| "\f"
+}
+
+TOKEN : /* OPERATORS */
+{
+  < PLUS : "+" >
+| < MINUS : "-" >
+| < MULTI : "*" >
+| < POWER : "**" >
+| < DIVIDE : "/" >
+| < MOD : "%" >
+| < ST : "<" >
+| < STEQ : "<=" >
+| < GT : ">" >
+| < GTEQ : ">=" >
+| < EQUALITY : "==" >
+| < NOTEQUAL : "!=" >
+| < AND : "and" >
+| < OR : "or" >
+| < NOT : "!" >
+| < NULL : "null" >
+}
+
+TOKEN :
+{
+  < CONSTANT: (< DIGIT >)+ >
+| < #DIGIT: [ "0"-"9" ] >
+| < #LETTER: ["a"-"z","A"-"Z"] >
+| < #IDCHARS: ["A" - "Z", "a" - "z", "0" - "9"] >
+}
+
+TOKEN :
+{
+  < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LSQPAREN: "[" >
+| < RSQPAREN: "]" >
+| < LBRACE: "{" >
+| < RBRACE: "}" >
+| < COMMA: "," >
+| < ASSIGN: "=" >
+| < CLASS: "class" >
+| < FUNC : "func" >
+| < IF: "if" >
+| < ELIF: "elif" >
+| < ELSE: "else" >
+| < WHILE: "while" >
+| < FOR: "for" >
+| < IN: "in">
+| < RANGE: "range" >
+| < NEW : "new" >
+| < INTEGER: "int" >
+| < BOOLEAN: "boolean" >
+| < ADD: "add" >
+| < LENGTH: "length" >
+| < CONTAINS: "contains" >
+| < RETURN: "return" >
+| < TRUE: "true" >
+| < FALSE: "false" >
+| < PRINT: "print" >
+| < READ : "read" >
+| < KEYS : "keys" >
+| < PUT : "put" >
+| < REMOVEFIRST: "removeFirst">
+| < ISEMPTY: "isEmpty" >
+| < INDEXOF: "indexof" >
+| < GET: "get" >
+| < INSERT : "insert" >
+| < DOT: "." >
+| < COLON: ":" >
+| < ID : < LETTER > ( < IDCHARS > ) * >
+}
+
+Program Program():
+{ArrayList<Class> classList = new ArrayList<Class>();ArrayList<Function> funcList = new ArrayList<Function>();
+ArrayList<Stm> stmList = new ArrayList<Stm>();Class c; Function f;Stm s;}
+{
+  (c = Class(){ classList.add(c);}
+|  f = Function(){ funcList.add(f);}
+|  s = Stm(){ stmList.add(s);})*
+  < EOF >
+  {return new Program(funcList,stmList,classList);}
+}
+
+Class Class():
+{String id; ArrayList<Class> cl = new ArrayList<Class>();ArrayList<Var> vl = new ArrayList<Var>();
+	ArrayList<Function> fl = new ArrayList<Function>(); Var v; Class c; Function f;}
+{
+  <CLASS><ID>{id = token.image;}<LBRACE>
+  (c = Class(){cl.add(c);}
+|  v = Var(){vl.add(v);}
+|  f = Function(){fl.add(f);})*
+  <RBRACE>
+  {return new Class(id,cl,vl,fl);}
+}
+
+Function Function():
+{ String id; ArrayList<Param> pl; ArrayList<Stm> stmList = new ArrayList<Stm>(); Stm stm;}
+{
+  < FUNC > < ID > { id = token.image;} <LPAREN> pl = ParamList() <RPAREN> <LBRACE>
+  ( stm = Stm() { stmList.add(stm);})*
+  < RBRACE> { return new Function( id, pl, stmList);}
+}
+
+Param Param() :
+{String id;}
+{
+  (<INTEGER>(<LSQPAREN><RSQPAREN>)?)<ID>{id = token.image;}
+  {return new Param(id);}
+}
+
+Var Var():
+{Exp e = null; String id;}
+{
+  <ID>{id = token.image;}(<COLON><ASSIGN>e = Exp())?{return new Var(e,id,false);}
+}
+
+Stm Stm() :
+{Stm stm; Exp e1, e2; String id;
+ArrayList<Stm> stmList = new ArrayList<Stm>(); ArrayList<Exp> el = new ArrayList<Exp>(); boolean isObject = true;}
+{
+  <LBRACE>(stm = Stm(){stmList.add(stm);})*<RBRACE>{return new CompoundStm(stmList);}
+| <IF>e1 = Exp(){el.add(e1);}stm = Stm(){stmList.add(stm);}
+	(LOOKAHEAD(2)<ELIF>e1 = Exp(){el.add(e1);}stm = Stm(){stmList.add(stm);})*
+	(LOOKAHEAD(2)<ELSE>stm = Stm(){stmList.add(stm);})?{return new If(el,stmList);}
+| LOOKAHEAD(4)<FOR><ID>{id = token.image;}<IN><RANGE><LPAREN>el = ExpList()<RPAREN>stm = Stm(){return new ForLoopExp(el,stm,id);}
+| <FOR><ID>{id = token.image;}<IN>e1 = Exp() stm = Stm(){return new ForLoopExp(e1,stm,id);}
+| <WHILE>e1 = Exp() stm = Stm(){return new WhileExp(e1, stm);}
+| <PRINT>el = ExpList(){return new PrintStm(el);}
+| LOOKAHEAD(4)<ID>{id = token.image;}<COLON><ASSIGN>e1 = Exp(){return new Var(e1, id, false);}
+| LOOKAHEAD(4)<ID>{id = token.image;}<COLON><ASSIGN><NEW>e1 = classCall(){return new Var(e1, id, isObject);}
+| LOOKAHEAD(2)<ID>{id = token.image;}<LSQPAREN>e1 = Exp()<RSQPAREN><ASSIGN>e2 = Exp(){return new ArrSet(id, e1, e2);}
+| LOOKAHEAD(3)<ID>{id = token.image;}<DOT><ADD><LPAREN>e1 = Exp()<RPAREN>{return new ArrAdd(id, e1);}
+| LOOKAHEAD(3)<ID>{id = token.image;}<DOT><INSERT><LPAREN>e1 = Exp()<COMMA>e2 = Exp()<RPAREN>{return new ArrInsert(id, e1 , e2);}
+| LOOKAHEAD(2)<ID>{id = token.image;}<ASSIGN>e1 = Exp(){return new AssignStm(id, e1);}
+| LOOKAHEAD(2)<ID>{id = token.image;}<DOT><PUT><LPAREN>e1 = Exp()<COMMA>e2 = Exp()<RPAREN>{return new DictPut(id,e1,e2);}
+//| LOOKAHEAD(3)<ID> { id = token.image; } <ASSIGN> < NEW > e1 = classCall() { return new Assign(id, e1); }
+//| LOOKAHEAD(2) e1 = element() < DOT > < ID > {idf = token.image;} <ASSIGN>  e2 = Exp() { return new AssignClassVar(e1, idf, e2); }
+| <RETURN>e1 = Exp(){return new ReturnStm(e1);}
+}
+
+Exp Exp() :
+{ Exp e; }
+{
+  e = LogExp() { return e; }
+}
+
+Exp LogExp() :
+{ Exp e1, e2; String id;}
+{
+  e1 = EqualityExp()
+  (( < OR > | < AND > ) {id = token.image; } e2 = EqualityExp() { e1 = new LogExp(id,e1, e2); })*
+  { return e1; }
+}
+
+Exp EqualityExp():
+{Exp e1,e2; String id;}
+{
+  e1 = RelExp()
+  ((< EQUALITY > | < NOTEQUAL >) { id = token.image;} e2 = RelExp() { e1 = new Equal(id,e1,e2);})*
+  { return e1; }
+}
+
+Exp RelExp():
+{Exp e1, e2;String id;}
+{
+  e1 = addMinus()
+  [(< ST > | < GT > | < GTEQ > | < STEQ >) { id = token.image;} e2 = addMinus() { e1 = new Compare(id,e1,e2);}]
+  { return e1; }
+}
+
+Exp addMinus():
+{Exp e1, e2; String id;}
+{
+  e1 = multiDiv()
+  ((< PLUS > | < MINUS >) { id = token.image;} e2 = multiDiv() { e1 = new OpExp(id,e1,e2);})*
+  { return e1;}
+}
+
+Exp multiDiv():
+{Exp e1, e2; String id;}
+{
+  e1=power()
+  (( < MULTI > | < DIVIDE >  | < MOD >) { id = token.image; }  e2=power() { e1 = new OpExp(id, e1, e2); } )*
+  { return e1; }
+}
+
+Exp power():
+{Exp e1, e2;String id;}
+{
+  e1=negation()
+  (< POWER > { id = token.image; } e2=negation() { e1 = new OpExp(id, e1, e2); })*
+  {return e1;}
+}
+
+Exp negation():
+{Exp e ; boolean negate = false;}
+{
+  (< NOT> { negate = !negate;})*
+  e = cmpElement()
+  {
+    if(negate) { return new Not(e);}
+	else { return e;}
+  }
+}
+
+Exp cmpElement():
+{Exp e1, e2; String id;}
+{
+  e1 = element()
+  (<LSQPAREN> e2 = Exp() <RSQPAREN> { return new ArrGet(e1, e2); }
+| LOOKAHEAD(2) <DOT><CONTAINS><LPAREN> e2 = Exp() <RPAREN> { return new ArrContains(e1, e2); }
+| LOOKAHEAD(2) <DOT><LENGTH> { return new ArrLength(e1); }
+| LOOKAHEAD(2) <DOT><INDEXOF><LPAREN> e2 = Exp() <RPAREN> { return new ArrIndexOf(e1,e2); }
+| LOOKAHEAD(2) <DOT><REMOVEFIRST><LPAREN><RPAREN> { return new ArrRemoveFirst(e1);}
+| LOOKAHEAD(2) <DOT><ISEMPTY><LPAREN><RPAREN>{ return new ArrEmpty(e1); }
+| LOOKAHEAD(3) <DOT>e2 = procedureCall(){return new ClassFuncExp(e1, e2);}
+//| LOOKAHEAD(3) < DOT ><ID> {idf = token.image;} <ASSIGN>  e2 = Exp() { return new AssignClassVar(e1, idf, e2); }
+| LOOKAHEAD(2) <DOT><ID>{id = token.image;} {return new ClassVarExp(e1, id);}
+| LOOKAHEAD(2) <DOT><KEYS><LPAREN><RPAREN> { return new DictKeys(e1); }
+| LOOKAHEAD(2) <DOT><GET><LPAREN>e2 = Exp()<RPAREN>{ return new DictGet(e1, e2); })*
+{return e1;}
+}
+
+Exp element() :
+{Exp e; String id; ArrayList<Exp> el;}
+{
+  <CONSTANT>{return new NumExp(Integer.parseInt(token.image));}
+| <MINUS>e = element(){return new NegInt(e);}
+| <PLUS>e = element() {return e;}
+| <TRUE>{return new True();}
+| <FALSE>{return new False();}
+| <NULL>{return new Null();}
+| <READ><LPAREN><RPAREN>{return new ReadExp();}
+| LOOKAHEAD(2)e = procedureCall(){return e;}
+| <ID>{id = token.image;}{return new IdExp(id);}
+| <LPAREN>e = Exp()<RPAREN>{return e;}
+| <INTEGER><LSQPAREN>el = ExpList()<RSQPAREN>{return new ArrDefine(el);}
+| <LSQPAREN><COLON><RSQPAREN>{return new Dict();}
+}
+
+Exp procedureCall() :
+{String id; ArrayList<Exp> el;}
+{
+  <ID>{id = token.image;}<LPAREN>el = ExpList()<RPAREN>{return new ProcedureExp(id, el);}
+}
+
+Exp classCall() :
+{String id; ArrayList<Exp> el;}
+{
+  <ID>{id = token.image;}<LPAREN>el = ExpList()<RPAREN>{return new ClassExp(id, el);}
+}
+
+ArrayList<Param> ParamList() :
+{ ArrayList<Param> pl = new ArrayList<Param>(); String id;}
+{
+    (<INTEGER>(< LSQPAREN><RSQPAREN >)?)<ID>{ id = token.image; } { pl.add(new Param(id)); }
+    (<COMMA> (<INTEGER>(< LSQPAREN><RSQPAREN >)?)<ID>{ id = token.image; }{ pl.add(new Param(id)); } )*{ return pl;}
+| { return pl;}
+}
+
+ArrayList<Exp> ExpList():
+{Exp e; ArrayList<Exp> el = new ArrayList<Exp>(); }
+{
+    e = Exp() { el.add(e); }(< COMMA > e = Exp() { el.add(e);})*{ return el; }
+| { return el; }
+}

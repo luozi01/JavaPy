@@ -1,0 +1,39 @@
+func quicksort(int[] q, int left, int right){
+    if left < right{
+			pivotIndex := (left + right) / 2
+			pivotNewIndex := partition(q, left, right, pivotIndex)
+			a := quicksort(q, left, pivotNewIndex - 1)
+			a = quicksort(q, pivotNewIndex + 1, right)
+		}
+	}
+
+func partition(int[] q, int left, int right, int pivotIndex){
+	pivot := q[pivotIndex]
+	a := swap(q, pivotIndex, right)
+	storeIndex := left
+	i := left
+	for x in range(left, right){
+	  if q[x] < pivot{
+	    a = swap(q, i, storeIndex)
+	    storeIndex = storeIndex + 1
+		}
+	  i = i + 1
+	}
+	a = swap(q, storeIndex, right)
+	return storeIndex
+}
+
+func swap(int[] A, int i, int j){
+	temp := A[i]
+	A[i] = A[j]
+	A[j] = temp
+}
+
+list := int[]
+for i in range(0, read()){
+	list.add(read())
+}
+a := quicksort(list, 0, list.length - 1)
+for i in list{
+	print i
+}
