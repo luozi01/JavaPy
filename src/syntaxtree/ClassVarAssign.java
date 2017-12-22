@@ -2,19 +2,20 @@ package syntaxtree;
 
 import visitor.Visitor;
 
+import java.util.ArrayList;
+
 public class ClassVarAssign extends Stm {
 
-    public Exp e1, e2;
-    public String id;
+    public Exp e;
+    public ArrayList<String> strList;
 
-    public ClassVarAssign(Exp e1, String id, Exp e2) {
-        this.e1 = e1;
-        this.e2 = e2;
-        this.id = id;
+    public ClassVarAssign(ArrayList<String> strList, Exp e) {
+        this.e = e;
+        this.strList = strList;
     }
 
     @Override
     public void accept(Visitor v) {
-       v.visit(this);
+        v.visit(this);
     }
 }

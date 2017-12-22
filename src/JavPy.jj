@@ -1,6 +1,3 @@
-/**
- * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
- */
 options
 {
   static = true;
@@ -76,7 +73,6 @@ TOKEN :
 | < RANGE: "range" >
 | < NEW : "new" >
 | < INTEGER: "int" >
-| < BOOLEAN: "boolean" >
 | < ADD: "add" >
 | < LENGTH: "length" >
 | < CONTAINS: "contains" >
@@ -131,7 +127,7 @@ Function Function():
 Param Param() :
 {String id;}
 {
-  (<INTEGER>(<LSQPAREN><RSQPAREN>)?)<ID>{id = token.image;}
+  <ID>{id = token.image;}
   {return new Param(id);}
 }
 
@@ -142,7 +138,7 @@ Var Var():
 }
 
 Stm Stm() :
-{Stm stm; Exp e1, e2; String id;
+{Stm stm; Exp e1, e2; String id; ArrayList<String> strList = new ArrayList<String>();
 ArrayList<Stm> stmList = new ArrayList<Stm>(); ArrayList<Exp> el = new ArrayList<Exp>(); boolean isObject = true;}
 {
   <LBRACE>(stm = Stm(){stmList.add(stm);})*<RBRACE>{return new CompoundStm(stmList);}
@@ -160,7 +156,7 @@ ArrayList<Stm> stmList = new ArrayList<Stm>(); ArrayList<Exp> el = new ArrayList
 | LOOKAHEAD(3)<ID>{id = token.image;}<DOT><INSERT><LPAREN>e1 = Exp()<COMMA>e2 = Exp()<RPAREN>{return new ArrInsert(id, e1 , e2);}
 | LOOKAHEAD(2)<ID>{id = token.image;}<ASSIGN>e1 = Exp(){return new AssignStm(id, e1);}
 | LOOKAHEAD(3)<ID>{id = token.image;}<DOT><PUT><LPAREN>e1 = Exp()<COMMA>e2 = Exp()<RPAREN>{return new DictPut(id,e1,e2);}
-| LOOKAHEAD(2)e1 = element()<DOT><ID>{id = token.image;}<ASSIGN>e2 = Exp(){return new ClassVarAssign(e1, id, e2);}
+| LOOKAHEAD(2)<ID>{strList.add(token.image);}<DOT><ID>{strList.add(token.image);}<ASSIGN>e2 = Exp(){return new ClassVarAssign(strList, e2);}
 | LOOKAHEAD(3)<ID>{id = token.image;}<ASSIGN><NEW>e1 = classCall(){return new AssignStm(id, e1);}
 | <RETURN>e1 = Exp(){return new ReturnStm(e1);}
 }
@@ -241,7 +237,6 @@ Exp cmpElement():
 | LOOKAHEAD(2) <DOT><REMOVEFIRST><LPAREN><RPAREN> { return new ArrRemoveFirst(e1);}
 | LOOKAHEAD(2) <DOT><ISEMPTY><LPAREN><RPAREN>{ return new ArrEmpty(e1); }
 | LOOKAHEAD(3) <DOT>e2 = procedureCall(){return new ClassFuncExp(e1, e2);}
-//| LOOKAHEAD(3) < DOT ><ID> {idf = token.image;} <ASSIGN>  e2 = Exp() { return new AssignClassVar(e1, idf, e2); }
 | LOOKAHEAD(2) <DOT><ID>{id = token.image;} {return new ClassVarExp(e1, id);}
 | LOOKAHEAD(2) <DOT><KEYS><LPAREN><RPAREN> { return new DictKeys(e1); }
 | LOOKAHEAD(2) <DOT><GET><LPAREN>e2 = Exp()<RPAREN>{ return new DictGet(e1, e2); })*
@@ -280,8 +275,8 @@ Exp classCall() :
 ArrayList<Param> ParamList() :
 { ArrayList<Param> pl = new ArrayList<Param>(); String id;}
 {
-  (<INTEGER>(< LSQPAREN><RSQPAREN >)?)<ID>{ id = token.image; } { pl.add(new Param(id)); }
-  (<COMMA> (<INTEGER>(< LSQPAREN><RSQPAREN >)?)<ID>{ id = token.image; }{ pl.add(new Param(id)); } )*{ return pl;}
+  <ID>{ id = token.image; } { pl.add(new Param(id)); }
+  (<COMMA><ID>{ id = token.image; }{ pl.add(new Param(id)); } )*{ return pl;}
 | { return pl;}
 }
 

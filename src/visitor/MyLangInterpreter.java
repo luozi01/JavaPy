@@ -7,9 +7,7 @@ import java.util.*;
 
 public class MyLangInterpreter extends DepthFirstVisitor {
 
-    private Stack<Env> envStack = new Stack<>(); //recursion backtrack;
-    private java.io.PrintStream out = System.out;
-    //    private boolean isReturn;
+    private Stack<Env> envStack = new Stack<>();
     private Object retVal;
     private String className = "";
 
@@ -89,21 +87,21 @@ public class MyLangInterpreter extends DepthFirstVisitor {
     }
 
     /**
-     * Exp e1, e2
-     * String id
+     * Exp e
+     * ArrayList<String></String> strList
      */
     public void visit(ClassVarAssign n) {
-        n.e1.accept(this);
-        if (!envStack.peek().isDefine((String) retVal)) {
+        if (!envStack.peek().isDefine(n.strList.get(0))) {
             System.err.println("class application: expected Class, given non-class");
             System.exit(7);
         }
-        Env cc = (Env) envStack.peek().getValue((String) retVal);
-        n.e2.accept(this);
+        Object className = envStack.peek().getValue(n.strList.get(0));
+        Env cc = (Env) envStack.peek().getValue((String) className);
+        n.e.accept(this);
         try {
-            cc.assign(n.id, retVal);
+            cc.assign(n.strList.get(1), retVal);
         } catch (RuntimeException e) {
-            System.err.println("cannot set undefined variable:  " + n.id);
+            System.err.println("cannot set undefined variable:  " + n.strList.get(1));
             System.exit(6);
         }
     }
@@ -217,9 +215,9 @@ public class MyLangInterpreter extends DepthFirstVisitor {
     public void visit(PrintStm n) {
         for (Exp e : n.expList) {
             e.accept(this);
-            out.print(retVal + " ");
+            System.out.print(retVal + " ");
         }
-        out.println();
+        System.out.println();
     }
 
     /**

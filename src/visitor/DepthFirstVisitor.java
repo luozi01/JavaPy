@@ -55,8 +55,7 @@ public class DepthFirstVisitor implements Visitor {
 
     @Override
     public void visit(ClassVarAssign n) {
-        n.e1.accept(this);
-        n.e2.accept(this);
+        n.e.accept(this);
     }
 
 
