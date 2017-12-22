@@ -8,16 +8,16 @@ import java.util.ArrayList;
 public class JavPy implements JavPyConstants {
 
     static final private int[] jj_la1 = new int[33];
-    static final private JJCalls[] jj_2_rtns = new JJCalls[20];
+    static final private JJCalls[] jj_2_rtns = new JJCalls[22];
     static final private LookaheadSuccess jj_ls = new LookaheadSuccess();
     /**
      * Generated Token Manager.
      */
-    static public JavPyTokenManager token_source;
+    private static JavPyTokenManager token_source;
     /**
      * Current token.
      */
-    static public Token token;
+    private static Token token;
     /**
      * Next token.
      */
@@ -32,7 +32,7 @@ public class JavPy implements JavPyConstants {
     static private int[] jj_la1_1;
     static private boolean jj_rescan = false;
     static private int jj_gc = 0;
-    static private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+    static private java.util.List<int[]> jj_expentries = new java.util.ArrayList<>();
     static private int[] jj_expentry;
     static private int jj_kind = -1;
     static private int[] jj_lasttokens = new int[100];
@@ -120,17 +120,28 @@ public class JavPy implements JavPyConstants {
         Class c;
         Function f;
         Stm s;
+        Exp e;
         label_1:
         while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                case PLUS:
+                case MINUS:
+                case NULL:
+                case CONSTANT:
+                case LPAREN:
+                case LSQPAREN:
                 case LBRACE:
                 case CLASS:
                 case FUNC:
                 case IF:
                 case WHILE:
                 case FOR:
+                case INTEGER:
                 case RETURN:
+                case TRUE:
+                case FALSE:
                 case PRINT:
+                case READ:
                 case ID:
                     ;
                     break;
@@ -147,12 +158,22 @@ public class JavPy implements JavPyConstants {
                     f = Function();
                     funcList.add(f);
                     break;
+                case PLUS:
+                case MINUS:
+                case NULL:
+                case CONSTANT:
+                case LPAREN:
+                case LSQPAREN:
                 case LBRACE:
                 case IF:
                 case WHILE:
                 case FOR:
+                case INTEGER:
                 case RETURN:
+                case TRUE:
+                case FALSE:
                 case PRINT:
+                case READ:
                 case ID:
                     s = Stm();
                     stmList.add(s);
@@ -174,7 +195,7 @@ public class JavPy implements JavPyConstants {
         String id;
         ArrayList<Class> cl = new ArrayList<Class>();
         ArrayList<Var> vl = new ArrayList<Var>();
-        ArrayList<Function> fl = new ArrayList<Function>();
+        ArrayList<Function> fl = new ArrayList<>();
         Var v;
         Class c;
         Function f;
@@ -235,12 +256,22 @@ public class JavPy implements JavPyConstants {
         label_3:
         while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                case PLUS:
+                case MINUS:
+                case NULL:
+                case CONSTANT:
+                case LPAREN:
+                case LSQPAREN:
                 case LBRACE:
                 case IF:
                 case WHILE:
                 case FOR:
+                case INTEGER:
                 case RETURN:
+                case TRUE:
+                case FALSE:
                 case PRINT:
+                case READ:
                 case ID:
                     ;
                     break;
@@ -312,12 +343,22 @@ public class JavPy implements JavPyConstants {
                 label_4:
                 while (true) {
                     switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        case PLUS:
+                        case MINUS:
+                        case NULL:
+                        case CONSTANT:
+                        case LPAREN:
+                        case LSQPAREN:
                         case LBRACE:
                         case IF:
                         case WHILE:
                         case FOR:
+                        case INTEGER:
                         case RETURN:
+                        case TRUE:
+                        case FALSE:
                         case PRINT:
+                        case READ:
                         case ID:
                             ;
                             break;
@@ -470,7 +511,7 @@ public class JavPy implements JavPyConstants {
                                 {
                                     if (true) return new AssignStm(id, e1);
                                 }
-                            } else if (jj_2_10(2)) {
+                            } else if (jj_2_10(3)) {
                                 jj_consume_token(ID);
                                 id = token.image;
                                 jj_consume_token(DOT);
@@ -482,6 +523,25 @@ public class JavPy implements JavPyConstants {
                                 jj_consume_token(RPAREN);
                                 {
                                     if (true) return new DictPut(id, e1, e2);
+                                }
+                            } else if (jj_2_11(2)) {
+                                e1 = element();
+                                jj_consume_token(DOT);
+                                jj_consume_token(ID);
+                                id = token.image;
+                                jj_consume_token(ASSIGN);
+                                e2 = Exp();
+                                {
+                                    if (true) return new ClassVarAssign(e1, id, e2);
+                                }
+                            } else if (jj_2_12(3)) {
+                                jj_consume_token(ID);
+                                id = token.image;
+                                jj_consume_token(ASSIGN);
+                                jj_consume_token(NEW);
+                                e1 = classCall();
+                                {
+                                    if (true) return new AssignStm(id, e1);
                                 }
                             } else {
                                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
@@ -786,7 +846,7 @@ public class JavPy implements JavPyConstants {
                 break;
                 default:
                     jj_la1[24] = jj_gen;
-                    if (jj_2_11(2)) {
+                    if (jj_2_13(2)) {
                         jj_consume_token(DOT);
                         jj_consume_token(CONTAINS);
                         jj_consume_token(LPAREN);
@@ -795,13 +855,13 @@ public class JavPy implements JavPyConstants {
                         {
                             if (true) return new ArrContains(e1, e2);
                         }
-                    } else if (jj_2_12(2)) {
+                    } else if (jj_2_14(2)) {
                         jj_consume_token(DOT);
                         jj_consume_token(LENGTH);
                         {
                             if (true) return new ArrLength(e1);
                         }
-                    } else if (jj_2_13(2)) {
+                    } else if (jj_2_15(2)) {
                         jj_consume_token(DOT);
                         jj_consume_token(INDEXOF);
                         jj_consume_token(LPAREN);
@@ -810,7 +870,7 @@ public class JavPy implements JavPyConstants {
                         {
                             if (true) return new ArrIndexOf(e1, e2);
                         }
-                    } else if (jj_2_14(2)) {
+                    } else if (jj_2_16(2)) {
                         jj_consume_token(DOT);
                         jj_consume_token(REMOVEFIRST);
                         jj_consume_token(LPAREN);
@@ -818,7 +878,7 @@ public class JavPy implements JavPyConstants {
                         {
                             if (true) return new ArrRemoveFirst(e1);
                         }
-                    } else if (jj_2_15(2)) {
+                    } else if (jj_2_17(2)) {
                         jj_consume_token(DOT);
                         jj_consume_token(ISEMPTY);
                         jj_consume_token(LPAREN);
@@ -826,20 +886,20 @@ public class JavPy implements JavPyConstants {
                         {
                             if (true) return new ArrEmpty(e1);
                         }
-                    } else if (jj_2_16(3)) {
+                    } else if (jj_2_18(3)) {
                         jj_consume_token(DOT);
                         e2 = procedureCall();
                         {
                             if (true) return new ClassFuncExp(e1, e2);
                         }
-                    } else if (jj_2_17(2)) {
+                    } else if (jj_2_19(2)) {
                         jj_consume_token(DOT);
                         jj_consume_token(ID);
                         id = token.image;
                         {
                             if (true) return new ClassVarExp(e1, id);
                         }
-                    } else if (jj_2_18(2)) {
+                    } else if (jj_2_20(2)) {
                         jj_consume_token(DOT);
                         jj_consume_token(KEYS);
                         jj_consume_token(LPAREN);
@@ -847,7 +907,7 @@ public class JavPy implements JavPyConstants {
                         {
                             if (true) return new DictKeys(e1);
                         }
-                    } else if (jj_2_19(2)) {
+                    } else if (jj_2_21(2)) {
                         jj_consume_token(DOT);
                         jj_consume_token(GET);
                         jj_consume_token(LPAREN);
@@ -921,7 +981,7 @@ public class JavPy implements JavPyConstants {
             break;
             default:
                 jj_la1[25] = jj_gen;
-                if (jj_2_20(2)) {
+                if (jj_2_22(2)) {
                     e = procedureCall();
                     {
                         if (true) return e;
@@ -1339,73 +1399,114 @@ public class JavPy implements JavPyConstants {
         }
     }
 
-    static private boolean jj_3R_25() {
-        if (jj_3R_26()) return true;
+    static private boolean jj_2_21(int xla) {
+        jj_la = xla;
+        jj_lastpos = jj_scanpos = token;
+        try {
+            return !jj_3_21();
+        } catch (LookaheadSuccess ls) {
+            return true;
+        } finally {
+            jj_save(20, xla);
+        }
+    }
+
+    static private boolean jj_2_22(int xla) {
+        jj_la = xla;
+        jj_lastpos = jj_scanpos = token;
+        try {
+            return !jj_3_22();
+        } catch (LookaheadSuccess ls) {
+            return true;
+        } finally {
+            jj_save(21, xla);
+        }
+    }
+
+    static private boolean jj_3R_37() {
+        if (jj_3R_38()) return true;
+        return false;
+    }
+
+    static private boolean jj_3R_19() {
+        if (jj_3R_37()) return true;
         return false;
     }
 
     static private boolean jj_3R_18() {
-        if (jj_3R_25()) return true;
-        return false;
-    }
-
-    static private boolean jj_3R_17() {
         if (jj_scan_token(ID)) return true;
         if (jj_scan_token(LPAREN)) return true;
         return false;
     }
 
     static private boolean jj_3R_15() {
-        if (jj_3R_18()) return true;
+        if (jj_3R_19()) return true;
         return false;
     }
 
-    static private boolean jj_3R_44() {
+    static private boolean jj_3R_36() {
+        if (jj_scan_token(LSQPAREN)) return true;
+        if (jj_scan_token(COLON)) return true;
+        return false;
+    }
+
+    static private boolean jj_3R_35() {
+        if (jj_scan_token(INTEGER)) return true;
         if (jj_scan_token(LSQPAREN)) return true;
         return false;
     }
 
-    static private boolean jj_3R_43() {
-        if (jj_scan_token(INTEGER)) return true;
-        return false;
-    }
-
-    static private boolean jj_3R_42() {
+    static private boolean jj_3R_34() {
         if (jj_scan_token(LPAREN)) return true;
+        if (jj_3R_15()) return true;
         return false;
     }
 
-    static private boolean jj_3R_41() {
+    static private boolean jj_3R_33() {
         if (jj_scan_token(ID)) return true;
         return false;
     }
 
-    static private boolean jj_3_20() {
-        if (jj_3R_17()) return true;
+    static private boolean jj_3_22() {
+        if (jj_3R_18()) return true;
         return false;
     }
 
-    static private boolean jj_3R_40() {
+    static private boolean jj_3R_32() {
         if (jj_scan_token(READ)) return true;
+        if (jj_scan_token(LPAREN)) return true;
         return false;
     }
 
-    static private boolean jj_3R_24() {
+    static private boolean jj_3R_25() {
         if (jj_scan_token(RETURN)) return true;
         return false;
     }
 
-    static private boolean jj_3R_39() {
+    static private boolean jj_3R_31() {
         if (jj_scan_token(NULL)) return true;
         return false;
     }
 
-    static private boolean jj_3R_38() {
+    static private boolean jj_3_12() {
+        if (jj_scan_token(ID)) return true;
+        if (jj_scan_token(ASSIGN)) return true;
+        if (jj_scan_token(NEW)) return true;
+        return false;
+    }
+
+    static private boolean jj_3R_30() {
         if (jj_scan_token(FALSE)) return true;
         return false;
     }
 
-    static private boolean jj_3R_37() {
+    static private boolean jj_3_11() {
+        if (jj_3R_17()) return true;
+        if (jj_scan_token(DOT)) return true;
+        return false;
+    }
+
+    static private boolean jj_3R_29() {
         if (jj_scan_token(TRUE)) return true;
         return false;
     }
@@ -1413,22 +1514,19 @@ public class JavPy implements JavPyConstants {
     static private boolean jj_3_10() {
         if (jj_scan_token(ID)) return true;
         if (jj_scan_token(DOT)) return true;
+        if (jj_scan_token(PUT)) return true;
         return false;
     }
 
-    static private boolean jj_3R_36() {
+    static private boolean jj_3R_28() {
         if (jj_scan_token(PLUS)) return true;
+        if (jj_3R_17()) return true;
         return false;
     }
 
     static private boolean jj_3_9() {
         if (jj_scan_token(ID)) return true;
         if (jj_scan_token(ASSIGN)) return true;
-        return false;
-    }
-
-    static private boolean jj_3R_35() {
-        if (jj_scan_token(MINUS)) return true;
         return false;
     }
 
@@ -1439,37 +1537,45 @@ public class JavPy implements JavPyConstants {
         return false;
     }
 
-    static private boolean jj_3R_34() {
-        if (jj_scan_token(CONSTANT)) return true;
+    static private boolean jj_3R_27() {
+        if (jj_scan_token(MINUS)) return true;
+        if (jj_3R_17()) return true;
         return false;
     }
 
-    static private boolean jj_3R_33() {
+    static private boolean jj_3_7() {
+        if (jj_scan_token(ID)) return true;
+        if (jj_scan_token(DOT)) return true;
+        if (jj_scan_token(ADD)) return true;
+        return false;
+    }
+
+    static private boolean jj_3R_17() {
         Token xsp;
         xsp = jj_scanpos;
-        if (jj_3R_34()) {
+        if (jj_3R_26()) {
             jj_scanpos = xsp;
-            if (jj_3R_35()) {
+            if (jj_3R_27()) {
                 jj_scanpos = xsp;
-                if (jj_3R_36()) {
+                if (jj_3R_28()) {
                     jj_scanpos = xsp;
-                    if (jj_3R_37()) {
+                    if (jj_3R_29()) {
                         jj_scanpos = xsp;
-                        if (jj_3R_38()) {
+                        if (jj_3R_30()) {
                             jj_scanpos = xsp;
-                            if (jj_3R_39()) {
+                            if (jj_3R_31()) {
                                 jj_scanpos = xsp;
-                                if (jj_3R_40()) {
+                                if (jj_3R_32()) {
                                     jj_scanpos = xsp;
-                                    if (jj_3_20()) {
+                                    if (jj_3_22()) {
                                         jj_scanpos = xsp;
-                                        if (jj_3R_41()) {
+                                        if (jj_3R_33()) {
                                             jj_scanpos = xsp;
-                                            if (jj_3R_42()) {
+                                            if (jj_3R_34()) {
                                                 jj_scanpos = xsp;
-                                                if (jj_3R_43()) {
+                                                if (jj_3R_35()) {
                                                     jj_scanpos = xsp;
-                                                    if (jj_3R_44()) return true;
+                                                    if (jj_3R_36()) return true;
                                                 }
                                             }
                                         }
@@ -1484,10 +1590,8 @@ public class JavPy implements JavPyConstants {
         return false;
     }
 
-    static private boolean jj_3_7() {
-        if (jj_scan_token(ID)) return true;
-        if (jj_scan_token(DOT)) return true;
-        if (jj_scan_token(ADD)) return true;
+    static private boolean jj_3R_26() {
+        if (jj_scan_token(CONSTANT)) return true;
         return false;
     }
 
@@ -1525,17 +1629,17 @@ public class JavPy implements JavPyConstants {
         return false;
     }
 
-    static private boolean jj_3R_23() {
+    static private boolean jj_3R_24() {
         if (jj_scan_token(PRINT)) return true;
         return false;
     }
 
-    static private boolean jj_3R_22() {
+    static private boolean jj_3R_23() {
         if (jj_scan_token(WHILE)) return true;
         return false;
     }
 
-    static private boolean jj_3R_21() {
+    static private boolean jj_3R_22() {
         if (jj_scan_token(FOR)) return true;
         return false;
     }
@@ -1548,25 +1652,25 @@ public class JavPy implements JavPyConstants {
         return false;
     }
 
-    static private boolean jj_3_19() {
+    static private boolean jj_3_21() {
         if (jj_scan_token(DOT)) return true;
         if (jj_scan_token(GET)) return true;
         return false;
     }
 
-    static private boolean jj_3_18() {
+    static private boolean jj_3_20() {
         if (jj_scan_token(DOT)) return true;
         if (jj_scan_token(KEYS)) return true;
         return false;
     }
 
-    static private boolean jj_3_17() {
+    static private boolean jj_3_19() {
         if (jj_scan_token(DOT)) return true;
         if (jj_scan_token(ID)) return true;
         return false;
     }
 
-    static private boolean jj_3R_20() {
+    static private boolean jj_3R_21() {
         if (jj_scan_token(IF)) return true;
         return false;
     }
@@ -1574,17 +1678,17 @@ public class JavPy implements JavPyConstants {
     static private boolean jj_3R_16() {
         Token xsp;
         xsp = jj_scanpos;
-        if (jj_3R_19()) {
+        if (jj_3R_20()) {
             jj_scanpos = xsp;
-            if (jj_3R_20()) {
+            if (jj_3R_21()) {
                 jj_scanpos = xsp;
                 if (jj_3_3()) {
                     jj_scanpos = xsp;
-                    if (jj_3R_21()) {
+                    if (jj_3R_22()) {
                         jj_scanpos = xsp;
-                        if (jj_3R_22()) {
+                        if (jj_3R_23()) {
                             jj_scanpos = xsp;
-                            if (jj_3R_23()) {
+                            if (jj_3R_24()) {
                                 jj_scanpos = xsp;
                                 if (jj_3_4()) {
                                     jj_scanpos = xsp;
@@ -1600,7 +1704,13 @@ public class JavPy implements JavPyConstants {
                                                         jj_scanpos = xsp;
                                                         if (jj_3_10()) {
                                                             jj_scanpos = xsp;
-                                                            if (jj_3R_24()) return true;
+                                                            if (jj_3_11()) {
+                                                                jj_scanpos = xsp;
+                                                                if (jj_3_12()) {
+                                                                    jj_scanpos = xsp;
+                                                                    if (jj_3R_25()) return true;
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -1617,96 +1727,96 @@ public class JavPy implements JavPyConstants {
         return false;
     }
 
-    static private boolean jj_3R_19() {
+    static private boolean jj_3R_20() {
         if (jj_scan_token(LBRACE)) return true;
         return false;
     }
 
-    static private boolean jj_3_16() {
+    static private boolean jj_3_18() {
         if (jj_scan_token(DOT)) return true;
-        if (jj_3R_17()) return true;
+        if (jj_3R_18()) return true;
         return false;
     }
 
-    static private boolean jj_3_15() {
+    static private boolean jj_3_17() {
         if (jj_scan_token(DOT)) return true;
         if (jj_scan_token(ISEMPTY)) return true;
         return false;
     }
 
-    static private boolean jj_3_14() {
+    static private boolean jj_3_16() {
         if (jj_scan_token(DOT)) return true;
         if (jj_scan_token(REMOVEFIRST)) return true;
         return false;
     }
 
-    static private boolean jj_3_13() {
+    static private boolean jj_3_15() {
         if (jj_scan_token(DOT)) return true;
         if (jj_scan_token(INDEXOF)) return true;
         return false;
     }
 
-    static private boolean jj_3_12() {
+    static private boolean jj_3_14() {
         if (jj_scan_token(DOT)) return true;
         if (jj_scan_token(LENGTH)) return true;
         return false;
     }
 
-    static private boolean jj_3_11() {
+    static private boolean jj_3_13() {
         if (jj_scan_token(DOT)) return true;
         if (jj_scan_token(CONTAINS)) return true;
         return false;
     }
 
-    static private boolean jj_3R_32() {
-        if (jj_3R_33()) return true;
+    static private boolean jj_3R_44() {
+        if (jj_3R_17()) return true;
         return false;
     }
 
-    static private boolean jj_3R_31() {
+    static private boolean jj_3R_43() {
         if (jj_scan_token(NOT)) return true;
         return false;
     }
 
-    static private boolean jj_3R_30() {
+    static private boolean jj_3R_42() {
         Token xsp;
         while (true) {
             xsp = jj_scanpos;
-            if (jj_3R_31()) {
+            if (jj_3R_43()) {
                 jj_scanpos = xsp;
                 break;
             }
         }
-        if (jj_3R_32()) return true;
+        if (jj_3R_44()) return true;
         return false;
     }
 
-    static private boolean jj_3R_29() {
-        if (jj_3R_30()) return true;
+    static private boolean jj_3R_41() {
+        if (jj_3R_42()) return true;
         return false;
     }
 
-    static private boolean jj_3R_28() {
-        if (jj_3R_29()) return true;
+    static private boolean jj_3R_40() {
+        if (jj_3R_41()) return true;
         return false;
     }
 
-    static private boolean jj_3R_27() {
-        if (jj_3R_28()) return true;
+    static private boolean jj_3R_39() {
+        if (jj_3R_40()) return true;
         return false;
     }
 
-    static private boolean jj_3R_26() {
-        if (jj_3R_27()) return true;
+    static private boolean jj_3R_38() {
+        if (jj_3R_39()) return true;
         return false;
     }
 
     private static void jj_la1_init_0() {
-        jj_la1_0 = new int[]{0x40000000, 0x40000000, 0x0, 0x0, 0x40000000, 0x10000000, 0x0, 0x40000000, 0x40000000, 0x0, 0x0, 0xc0000, 0xc0000, 0x30000, 0x30000, 0xf000, 0xf000, 0xc0, 0xc0, 0xd00, 0xd00, 0x200, 0x100000, 0x10000000, 0x10000000, 0x6000c0, 0x14000000, 0x10000000, 0x0, 0x10000000, 0x0, 0x0, 0x147000c0,};
+        jj_la1_0 = new int[]{0x546000c0, 0x546000c0, 0x0, 0x0, 0x546000c0, 0x10000000, 0x0, 0x546000c0, 0x40000000, 0x0, 0x0, 0xc0000, 0xc0000, 0x30000, 0x30000, 0xf000, 0xf000, 0xc0, 0xc0, 0xd00, 0xd00, 0x200, 0x100000, 0x10000000, 0x10000000, 0x6000c0, 0x14000000, 0x10000000, 0x0, 0x10000000, 0x0, 0x0, 0x147000c0,};
     }
 
     private static void jj_la1_init_1() {
-        jj_la1_1 = new int[]{0x8012019c, 0x8012019c, 0x8000000c, 0x8000000c, 0x80120190, 0x0, 0x40000000, 0x80120190, 0x10, 0x100180, 0x20000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x20000000, 0x0, 0x2c0000, 0x80001000, 0x0, 0x1, 0x0, 0x1000, 0x1, 0x802c1000,};
+        jj_la1_1 = new int[]{0x803e119c, 0x803e119c, 0x8000000c, 0x8000000c, 0x803e1190, 0x0, 0x40000000, 0x803e1190, 0x10, 0x100180, 0x20000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x20000000, 0x0, 0x2c0000, 0x80001000, 0x0, 0x1, 0x0, 0x1000, 0x1, 0x802c1000,};
     }
 
     /**
@@ -1904,7 +2014,7 @@ public class JavPy implements JavPyConstants {
 
     static private void jj_rescan_token() {
         jj_rescan = true;
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 22; i++) {
             try {
                 JJCalls p = jj_2_rtns[i];
                 do {
@@ -1971,6 +2081,12 @@ public class JavPy implements JavPyConstants {
                                 break;
                             case 19:
                                 jj_3_20();
+                                break;
+                            case 20:
+                                jj_3_21();
+                                break;
+                            case 21:
+                                jj_3_22();
                                 break;
                         }
                     }

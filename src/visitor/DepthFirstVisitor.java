@@ -43,6 +43,7 @@ public class DepthFirstVisitor implements Visitor {
         n.className.accept(this);
     }
 
+
     /**
      * Exp classExp, funcExp
      */
@@ -50,6 +51,12 @@ public class DepthFirstVisitor implements Visitor {
     public void visit(ClassFuncExp n) {
         n.classExp.accept(this);
         n.funcExp.accept(this);
+    }
+
+    @Override
+    public void visit(ClassVarAssign n) {
+        n.e1.accept(this);
+        n.e2.accept(this);
     }
 
 

@@ -24,7 +24,7 @@ public class Env {
             return nextEnv.getValue(varName);
     }
 
-    private void assign(String varName, Object value) {
+    public void assign(String varName, Object value) {
         if (varMap.containsKey(varName))
             varMap.put(varName, value);
         else if (nextEnv == null)

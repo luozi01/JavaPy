@@ -7,7 +7,6 @@ import java.util.*;
 
 public class MyLangInterpreter extends DepthFirstVisitor {
 
-    private HashMap<String, Env> classMap = new HashMap<>();
     private Stack<Env> envStack = new Stack<>(); //recursion backtrack;
     private java.io.PrintStream out = System.out;
     //    private boolean isReturn;
@@ -34,7 +33,7 @@ public class MyLangInterpreter extends DepthFirstVisitor {
      */
     public void visit(Class n) {
         //main class
-        if (classMap.containsKey(n.id)) {
+        if (envStack.peek().isDefine(n.id)) {
             System.err.println(n.id + " class is defined");
             System.exit(7);
         }
@@ -44,8 +43,8 @@ public class MyLangInterpreter extends DepthFirstVisitor {
             v.accept(this);
         for (Function f : n.fl)
             f.accept(this);
-        classMap.put(n.id, classEnv);
         envStack.pop();
+        envStack.peek().varMap.put(n.id, classEnv);
         //subclass
         for (Class c : n.cl)
             c.accept(this);
@@ -55,11 +54,11 @@ public class MyLangInterpreter extends DepthFirstVisitor {
      * ArrayList<Exp></Exp> el
      */
     public void visit(ClassExp n) {
-        if (!classMap.containsKey(n.id)) {
-            System.err.println("class application: expected Class, given non-class" + n.id);
+        if (!envStack.peek().isDefine(n.id)) {
+            System.err.println("class application: expected Class, given non-class: " + n.id);
             System.exit(7);
         }
-        if (!classMap.get(n.id).procMap.containsKey("init")) {
+        if (!((Env) envStack.peek().getValue(n.id)).procMap.containsKey("init")) {
             System.err.println(n.id + "class application: expected Object, given no constructor");
             System.exit(7);
         }
@@ -74,7 +73,7 @@ public class MyLangInterpreter extends DepthFirstVisitor {
      */
     public void visit(ClassVarExp n) {
         n.className.accept(this);
-        retVal = classMap.get(retVal).getValue(n.varName);
+        retVal = ((Env) envStack.peek().getValue((String) retVal)).getValue(n.varName);
     }
 
     /**
@@ -82,11 +81,31 @@ public class MyLangInterpreter extends DepthFirstVisitor {
      */
     public void visit(ClassFuncExp n) {
         n.classExp.accept(this);
-        if (!classMap.containsKey(retVal)) {
+        if (!envStack.peek().isDefine((String) retVal)) {
             System.err.println(retVal + " class application: expected Class, given non-class");
             System.exit(7);
         }
         n.funcExp.accept(this);
+    }
+
+    /**
+     * Exp e1, e2
+     * String id
+     */
+    public void visit(ClassVarAssign n) {
+        n.e1.accept(this);
+        if (!envStack.peek().isDefine((String) retVal)) {
+            System.err.println("class application: expected Class, given non-class");
+            System.exit(7);
+        }
+        Env cc = (Env) envStack.peek().getValue((String) retVal);
+        n.e2.accept(this);
+        try {
+            cc.assign(n.id, retVal);
+        } catch (RuntimeException e) {
+            System.err.println("cannot set undefined variable:  " + n.id);
+            System.exit(6);
+        }
     }
 
     /**
@@ -107,24 +126,44 @@ public class MyLangInterpreter extends DepthFirstVisitor {
      * String id
      */
     public void visit(ProcedureExp n) {
-        if (!className.isEmpty())
-            envStack.push(classMap.get(className));
-        if (!envStack.peek().procMap.containsKey(n.id)) {
-            System.err.println(n.id + " method is not defined");
-            System.exit(7);
+        Env ogEnv;
+        if (envStack.peek().procMap.containsKey(n.id)) {
+            if (!envStack.peek().procMap.containsKey(n.id)) {
+                System.err.println(n.id + " method is not defined");
+                System.exit(7);
+            }
+            @SuppressWarnings("unchecked")
+            ArrayList<Param> paramList = (ArrayList<Param>) envStack.peek().getValue(n.id);
+            if (paramList.size() != n.expList.size()) {
+                System.err.println("procedure expects " + paramList.size() + " arguments, given " + n.expList.size());
+                System.exit(8);
+            }
+            ogEnv = new Env(envStack.peek());
+            for (int i = 0; i < n.expList.size(); i++) {
+                n.expList.get(i).accept(this);
+                ogEnv.varMap.put(paramList.get(i).id, retVal);
+            }
+            ogEnv.procMap = new HashMap<>(envStack.peek().procMap);
+        } else {
+            Env classEnv = (Env) envStack.peek().getValue(className);
+            if (!classEnv.procMap.containsKey(n.id)) {
+                System.err.println(n.id + " class method is not defined");
+                System.exit(7);
+            }
+            @SuppressWarnings("unchecked")
+            ArrayList<Param> paramList = (ArrayList<Param>) classEnv.getValue(n.id);
+            if (paramList.size() != n.expList.size()) {
+                System.err.println("procedure expects " + paramList.size() + " arguments, given " + n.expList.size());
+                System.exit(8);
+            }
+            ogEnv = new Env(classEnv);
+            for (int i = 0; i < n.expList.size(); i++) {
+                n.expList.get(i).accept(this);
+                ogEnv.varMap.put(paramList.get(i).id, retVal);
+            }
+            ogEnv.procMap = new HashMap<>(classEnv.procMap);
+
         }
-        @SuppressWarnings("unchecked")
-        ArrayList<Param> paramList = (ArrayList<Param>) envStack.peek().getValue(n.id);
-        if (paramList.size() != n.expList.size()) {
-            System.err.println("procedure expects " + paramList.size() + " arguments, given " + n.expList.size());
-            System.exit(8);
-        }
-        Env ogEnv = new Env(envStack.peek());
-        for (int i = 0; i < n.expList.size(); i++) {
-            n.expList.get(i).accept(this);
-            ogEnv.varMap.put(paramList.get(i).id, retVal);
-        }
-        ogEnv.procMap = new HashMap<>(envStack.peek().procMap);
         envStack.push(ogEnv);
         ArrayList<Stm> stmList = envStack.peek().procMap.get(n.id);
         for (Stm stm : stmList)

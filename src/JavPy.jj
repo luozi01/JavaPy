@@ -99,7 +99,7 @@ TOKEN :
 
 Program Program():
 {ArrayList<Class> classList = new ArrayList<Class>();ArrayList<Function> funcList = new ArrayList<Function>();
-ArrayList<Stm> stmList = new ArrayList<Stm>();Class c; Function f;Stm s;}
+ArrayList<Stm> stmList = new ArrayList<Stm>();Class c; Function f;Stm s;Exp e;}
 {
   (c = Class(){ classList.add(c);}
 |  f = Function(){ funcList.add(f);}
@@ -159,9 +159,9 @@ ArrayList<Stm> stmList = new ArrayList<Stm>(); ArrayList<Exp> el = new ArrayList
 | LOOKAHEAD(3)<ID>{id = token.image;}<DOT><ADD><LPAREN>e1 = Exp()<RPAREN>{return new ArrAdd(id, e1);}
 | LOOKAHEAD(3)<ID>{id = token.image;}<DOT><INSERT><LPAREN>e1 = Exp()<COMMA>e2 = Exp()<RPAREN>{return new ArrInsert(id, e1 , e2);}
 | LOOKAHEAD(2)<ID>{id = token.image;}<ASSIGN>e1 = Exp(){return new AssignStm(id, e1);}
-| LOOKAHEAD(2)<ID>{id = token.image;}<DOT><PUT><LPAREN>e1 = Exp()<COMMA>e2 = Exp()<RPAREN>{return new DictPut(id,e1,e2);}
-//| LOOKAHEAD(3)<ID> { id = token.image; } <ASSIGN> < NEW > e1 = classCall() { return new Assign(id, e1); }
-//| LOOKAHEAD(2) e1 = element() < DOT > < ID > {idf = token.image;} <ASSIGN>  e2 = Exp() { return new AssignClassVar(e1, idf, e2); }
+| LOOKAHEAD(3)<ID>{id = token.image;}<DOT><PUT><LPAREN>e1 = Exp()<COMMA>e2 = Exp()<RPAREN>{return new DictPut(id,e1,e2);}
+| LOOKAHEAD(2)e1 = element()<DOT><ID>{id = token.image;}<ASSIGN>e2 = Exp(){return new ClassVarAssign(e1, id, e2);}
+| LOOKAHEAD(3)<ID>{id = token.image;}<ASSIGN><NEW>e1 = classCall(){return new AssignStm(id, e1);}
 | <RETURN>e1 = Exp(){return new ReturnStm(e1);}
 }
 
@@ -280,8 +280,8 @@ Exp classCall() :
 ArrayList<Param> ParamList() :
 { ArrayList<Param> pl = new ArrayList<Param>(); String id;}
 {
-    (<INTEGER>(< LSQPAREN><RSQPAREN >)?)<ID>{ id = token.image; } { pl.add(new Param(id)); }
-    (<COMMA> (<INTEGER>(< LSQPAREN><RSQPAREN >)?)<ID>{ id = token.image; }{ pl.add(new Param(id)); } )*{ return pl;}
+  (<INTEGER>(< LSQPAREN><RSQPAREN >)?)<ID>{ id = token.image; } { pl.add(new Param(id)); }
+  (<COMMA> (<INTEGER>(< LSQPAREN><RSQPAREN >)?)<ID>{ id = token.image; }{ pl.add(new Param(id)); } )*{ return pl;}
 | { return pl;}
 }
 

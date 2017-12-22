@@ -1,9 +1,9 @@
 class BSTree{
     class Node {
-        var key
-        var left
-        var right
-        var parent
+        key
+        left
+        right
+        parent
 
         func init(int keyInt) {
             key = keyInt
@@ -13,16 +13,16 @@ class BSTree{
         }
     }
 
-    var root = null
+    root := null
 
     func init() {
       root = null
     }
 
     func addNode(int item){
-      var curr = root
-      var parent = null
-      var newNode = new Node(item)
+      curr := root
+      parent := null
+      newNode := new Node(item)
 
       if root == null {
           root = newNode
@@ -46,7 +46,7 @@ class BSTree{
     }
 
     func containsNode(int target){
-        var curr = root
+        curr := root
         while curr != null {
             if target == curr.key{
                 return 1
@@ -61,7 +61,7 @@ class BSTree{
     }
 
     func findMaxNode(Node curr){
-        if(curr.right == null){
+        if curr.right == null{
             return curr
         }else{
           return findMaxNode(curr.right)
@@ -72,13 +72,11 @@ class BSTree{
         if node == root {
             if node.left == null and node.right == null{
                 root = null
-            }
-            elif node.left != null {
+            } elif node.left != null {
                 root = node.left
                 node.left = null
                 root.parent = null
-            }
-            elif node.right != null {
+            } elif node.right != null {
                 root = node.right
                 node.right = null
                 root.parent = null
@@ -87,8 +85,7 @@ class BSTree{
         elif node.left != null {
             if node == node.parent.left {
                 node.parent.left = node.left
-            }
-            else{
+            } else{
                 node.parent.right = node.left
             }
             node.left.parent = node.parent
@@ -97,7 +94,7 @@ class BSTree{
         elif node.right != null {
             if node == node.parent.right {
                 node.parent.right = node.right
-            }else{
+            } else{
                 node.parent.left = node.right
             }
             node.right.parent = node.parent
@@ -118,10 +115,9 @@ class BSTree{
         }
         if curr.key == item{
             return curr
-        }
-        else if curr.key > item {
+        } elif curr.key > item {
             return findNode(curr.left, item)
-        }else{
+        } else {
             return findNode(curr.right, item)
         }
     }

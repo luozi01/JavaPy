@@ -17,6 +17,8 @@ public interface Visitor {
 
     void visit(ClassFuncExp n);
 
+    void visit(ClassVarAssign n);
+
     void visit(Function n);
 
     void visit(CompoundStm n);
@@ -92,5 +94,6 @@ public interface Visitor {
     void visit(DictPut n);
 
     void visit(DictKeys n);
+
 
 }
