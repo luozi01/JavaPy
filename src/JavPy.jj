@@ -95,12 +95,12 @@ TOKEN :
 
 Program Program():
 {ArrayList<Class> classList = new ArrayList<Class>();ArrayList<Function> funcList = new ArrayList<Function>();
-ArrayList<Stm> stmList = new ArrayList<Stm>();Class c; Function f;Stm s;Exp e;}
+ArrayList<Stm> stmList = new ArrayList<Stm>();Class c; Function f;Stm s;}
 {
   (c = Class(){ classList.add(c);}
 |  f = Function(){ funcList.add(f);}
 |  s = Stm(){ stmList.add(s);})*
-  < EOF >
+  <EOF>
   {return new Program(funcList,stmList,classList);}
 }
 
@@ -119,9 +119,9 @@ Class Class():
 Function Function():
 { String id; ArrayList<Param> pl; ArrayList<Stm> stmList = new ArrayList<Stm>(); Stm stm;}
 {
-  < FUNC > < ID > { id = token.image;} <LPAREN> pl = ParamList() <RPAREN> <LBRACE>
-  ( stm = Stm() { stmList.add(stm);})*
-  < RBRACE> { return new Function( id, pl, stmList);}
+  <FUNC><ID>{id = token.image;}<LPAREN>pl = ParamList()<RPAREN><LBRACE>
+  (stm = Stm(){stmList.add(stm);})*
+  <RBRACE>{return new Function(id, pl, stmList);}
 }
 
 Param Param() :
@@ -230,16 +230,16 @@ Exp cmpElement():
 {Exp e1, e2; String id;}
 {
   e1 = element()
-  (<LSQPAREN> e2 = Exp() <RSQPAREN> { return new ArrGet(e1, e2); }
-| LOOKAHEAD(2) <DOT><CONTAINS><LPAREN> e2 = Exp() <RPAREN> { return new ArrContains(e1, e2); }
-| LOOKAHEAD(2) <DOT><LENGTH> { return new ArrLength(e1); }
-| LOOKAHEAD(2) <DOT><INDEXOF><LPAREN> e2 = Exp() <RPAREN> { return new ArrIndexOf(e1,e2); }
-| LOOKAHEAD(2) <DOT><REMOVEFIRST><LPAREN><RPAREN> { return new ArrRemoveFirst(e1);}
-| LOOKAHEAD(2) <DOT><ISEMPTY><LPAREN><RPAREN>{ return new ArrEmpty(e1); }
+  (<LSQPAREN>e2 = Exp()<RSQPAREN>{return new ArrGet(e1, e2);}
+| LOOKAHEAD(2) <DOT><CONTAINS><LPAREN>e2 = Exp()<RPAREN>{return new ArrContains(e1, e2);}
+| LOOKAHEAD(2) <DOT><LENGTH>{return new ArrLength(e1);}
+| LOOKAHEAD(2) <DOT><INDEXOF><LPAREN>e2 = Exp()<RPAREN>{return new ArrIndexOf(e1,e2);}
+| LOOKAHEAD(2) <DOT><REMOVEFIRST><LPAREN><RPAREN>{return new ArrRemoveFirst(e1);}
+| LOOKAHEAD(2) <DOT><ISEMPTY><LPAREN><RPAREN>{return new ArrEmpty(e1);}
 | LOOKAHEAD(3) <DOT>e2 = procedureCall(){return new ClassFuncExp(e1, e2);}
-| LOOKAHEAD(2) <DOT><ID>{id = token.image;} {return new ClassVarExp(e1, id);}
-| LOOKAHEAD(2) <DOT><KEYS><LPAREN><RPAREN> { return new DictKeys(e1); }
-| LOOKAHEAD(2) <DOT><GET><LPAREN>e2 = Exp()<RPAREN>{ return new DictGet(e1, e2); })*
+| LOOKAHEAD(2) <DOT><ID>{id = token.image;}{return new ClassVarExp(e1, id);}
+| LOOKAHEAD(2) <DOT><KEYS><LPAREN><RPAREN>{return new DictKeys(e1);}
+| LOOKAHEAD(2) <DOT><GET><LPAREN>e2 = Exp()<RPAREN>{return new DictGet(e1, e2);})*
 {return e1;}
 }
 
@@ -275,14 +275,14 @@ Exp classCall() :
 ArrayList<Param> ParamList() :
 { ArrayList<Param> pl = new ArrayList<Param>(); String id;}
 {
-  <ID>{ id = token.image; } { pl.add(new Param(id)); }
-  (<COMMA><ID>{ id = token.image; }{ pl.add(new Param(id)); } )*{ return pl;}
-| { return pl;}
+   <ID>{id = token.image;}{pl.add(new Param(id));}
+  (<COMMA><ID>{id = token.image;}{pl.add(new Param(id)); } )*{ return pl;}
+| {return pl;}
 }
 
 ArrayList<Exp> ExpList():
 {Exp e; ArrayList<Exp> el = new ArrayList<Exp>(); }
 {
-    e = Exp() { el.add(e); }(< COMMA > e = Exp() { el.add(e);})*{ return el; }
-| { return el; }
+   e = Exp(){el.add(e);}(<COMMA>e = Exp(){el.add(e);})*{ return el;}
+| {return el;}
 }
