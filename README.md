@@ -5,5 +5,5 @@ Run:
 java JavPyInterpret filename (< inputfilename)
 
 Issues:
-Class function does not work due to changing structure. Working in it.
+precedure dot call does not work
 
