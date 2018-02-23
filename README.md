@@ -1,5 +1,5 @@
 # JavaPy
-Self-design languange, combination of Java and python. 
+Undergrad level Self-design languange, combination of Java and python. 
 
 Run:
 java JavPyInterpret filename (< inputfilename)
